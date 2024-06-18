@@ -20,7 +20,7 @@ class CustomerFactory extends Factory
         $address = mb_substr($this->faker->address, 9);
         return [
             'name' => $this->faker->name,
-            'kana' => $this->faker->kanaName,
+            'kana' => $this->faker->name,
             'tel' => $tel,
             'email' => $this->faker->email,
             'postcode' => $this->faker->postcode,
