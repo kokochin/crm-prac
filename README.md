@@ -7,7 +7,6 @@ readme
 ### change
 # しました
 
-
 ## welcome
 やっほー！
 ようこそ！
