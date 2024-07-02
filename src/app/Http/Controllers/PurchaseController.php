@@ -8,6 +8,7 @@ use App\Models\Purchase;
 use App\Models\Customer;
 use App\Models\Item;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -24,13 +25,14 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        $customers = Customer::select('id', 'name', 'kana')->get();
-        $items = Item::select('id', 'name', 'price')->where('is_selling',true)->get();
-
-        return Inertia::render('Purchases/Create', [
-            'customers' => $customers,
-            'items' => $items
-        ]);
+          //$customers =Customer::select('id', 'name','kana')-> get();
+          $items = Item::select('id', 'name', 'price') 
+          ->where('is_selling', true)->get();
+  
+          return Inertia::render('Purchases/Create', [
+            //  'customers' => $customers,
+              'items' => $items
+          ]);
     }
 
     /**
@@ -38,6 +40,29 @@ class PurchaseController extends Controller
      */
     public function store(StorePurchaseRequest $request)
     {
+
+        DB::beginTransaction();
+        
+        try{
+            $purchase = Purchase::create([
+                'cusutomer_id' => $request->customer_id,
+                'status' => $request->status
+               ]);
+        
+               foreach($request->items as $item){
+                $purchase->items()->attach($purchase->id, [
+                    'item_id' => $item['id'],
+                    'quantity' => $item['quantity']
+                ]);
+               }
+
+               DB::commit();
+
+               return to_route('dashboard');
+            
+        }catch(\Exception $e) {
+            DB::rollBack();
+        }
        
         $purchase = Purchase::create([
             'cusutomer_id' => $request->customer_id,
